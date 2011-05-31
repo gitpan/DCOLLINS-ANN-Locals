@@ -1,0 +1,5 @@
+Revision History for DCOLLINS::AI
+
+0.001     2011-05-31 02:43:51 UTC
+          Initial release. ::Robot is a basic replacement for the AI::ANN 
+          constructor. Some tests, which, amazingly, all pass. 
