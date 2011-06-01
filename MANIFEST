@@ -5,11 +5,13 @@ META.yml
 Makefile.PL
 README
 dist.ini
+examples/evolver.pl
 gpl.txt
 lib/DCOLLINS/ANN/Robot.pm
 lib/DCOLLINS/ANN/SimWorld.pm
 t/00_initialize.t
 t/02_network_basic.t
+t/03_world_basic.t
 t/release-pod-coverage.t
 t/release-pod-syntax.t
 weaver.ini

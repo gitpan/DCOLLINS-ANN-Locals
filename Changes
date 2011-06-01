@@ -1,5 +1,13 @@
 Revision History for DCOLLINS::AI
 
+0.002     2011-06-01 05:23:14 UTC
+          Now we use Moose!
+
+          SimWorld skeleton is also complete. See the script in examples for 
+          a simple example without any actual evolution.
+
+          Tests for Simworld.
+
 0.001     2011-05-31 02:43:51 UTC
           Initial release. ::Robot is a basic replacement for the AI::ANN 
           constructor. Some tests, which, amazingly, all pass. 

@@ -1,6 +1,6 @@
 # change 'tests => 1' to 'tests => last_test_to_print';
 
-use Test::More tests => 7;
+use Test::More tests => 9;
 BEGIN { use_ok('DCOLLINS::ANN::Robot'); 
 	use_ok('DCOLLINS::ANN::SimWorld'); };
 
@@ -19,3 +19,9 @@ $world=new DCOLLINS::ANN::SimWorld ();
 
 ok(defined $world, "new() works");
 ok($world->isa("DCOLLINS::ANN::SimWorld"), "Right class");
+
+$retval=$world->run_robot($network);
+
+ok(defined $retval, "run_robot() works");
+ok(defined $retval->{'fitness'}, "run_robot() gives a fitness value");
+

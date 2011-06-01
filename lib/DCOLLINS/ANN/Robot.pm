@@ -1,63 +1,64 @@
 #!/usr/bin/perl
 package DCOLLINS::ANN::Robot;
 BEGIN {
-  $DCOLLINS::ANN::Robot::VERSION = '0.001';
+  $DCOLLINS::ANN::Robot::VERSION = '0.002';
 }
 use strict;
 use warnings;
 # ABSTRACT: a wrapper for AI::ANN
 
-use base qw(AI::ANN);
+use Moose;
+extends 'AI::ANN';
+
 use Storable qw(dclone);
 
 
-sub new {
+around BUILDARGS => sub {
+	my $orig = shift;
 	my $class = shift;
-	my $self = {};
-	my %data = ();
+	my %data;
 	$data{'inputs'} = 13;
 	$data{'minvalue'} = -2;
-	$data{'maxvalue'} = 2;
+	$data{'maxvalue'} = 4;
 	my $arg2 = [];
 	for (my $i = 0; $i < 13; $i++) {
-		push $arg2, { 'iamanoutput' => 0, # Requires Perl 5.14 !!!
+		push @$arg2, { 'iamanoutput' => 0,
 					  'inputs' => { $i => rand() },
 					  'neurons' => { } };
-		push $arg2, { 'iamanoutput' => 0,
-					  'inputs' => { $i => 3 * rand() - 2 },
+		push @$arg2, { 'iamanoutput' => 0,
+					  'inputs' => { $i => rand() - 0.5 },
 					  'neurons' => { } };
 	} # Made neurons 0-25
 	for (my $i = 0; $i < 13; $i++) {
 		my $working = {};
 		for (my $j = 0; $j < 26; $j ++) {
-			$working->{$j}=rand();
+			$working->{$j}=rand() / 10;
 		}
-		push $arg2, { 'iamanoutput' => 0,
+		push @$arg2, { 'iamanoutput' => 0,
 					  'inputs' => {},
 					  'neurons' => $working };
 	} # Made neurons 26-38
 	for (my $i = 0; $i < 13; $i++) {
 		my $working = {};
-		for (my $j = 13; $j < 39; $j ++) {
-			$working->{$j}=rand();
+		for (my $j = 0; $j < 39; $j ++) {
+			$working->{$j}= rand() / 10;
 		}
-		push $arg2, { 'iamanoutput' => 0,
+		push @$arg2, { 'iamanoutput' => 0,
 					  'inputs' => {},
 					  'neurons' => $working };
 	} # Made neurons 39-51
 	for (my $i = 0; $i < 5; $i++) {
 		my $working = {};
 		for (my $j = 26; $j < 52; $j ++) {
-			$working->{$j}=rand();
+			$working->{$j}=rand() / 2;
 		}
-		push $arg2, { 'iamanoutput' => 1,
+		push @$arg2, { 'iamanoutput' => 1,
 					  'inputs' => {},
 					  'neurons' => $working };
 	} # Made neurons 52-56
 	$data{'data'} = $arg2;
-	$self = $class->SUPER::new(%data);
-	return $self;
-}
+	return $class->$orig(%data);
+};
 
 1;
 
@@ -70,7 +71,7 @@ DCOLLINS::ANN::Robot - a wrapper for AI::ANN
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
