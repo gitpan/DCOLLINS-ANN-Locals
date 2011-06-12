@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 package DCOLLINS::ANN::Robot;
 BEGIN {
-  $DCOLLINS::ANN::Robot::VERSION = '0.002';
+  $DCOLLINS::ANN::Robot::VERSION = '0.003';
 }
 use strict;
 use warnings;
@@ -11,54 +11,91 @@ use Moose;
 extends 'AI::ANN';
 
 use Storable qw(dclone);
+use Math::Libm qw(erf M_PI tan);
 
 
 around BUILDARGS => sub {
-	my $orig = shift;
-	my $class = shift;
-	my %data;
-	$data{'inputs'} = 13;
-	$data{'minvalue'} = -2;
-	$data{'maxvalue'} = 4;
-	my $arg2 = [];
-	for (my $i = 0; $i < 13; $i++) {
-		push @$arg2, { 'iamanoutput' => 0,
-					  'inputs' => { $i => rand() },
-					  'neurons' => { } };
-		push @$arg2, { 'iamanoutput' => 0,
-					  'inputs' => { $i => rand() - 0.5 },
-					  'neurons' => { } };
-	} # Made neurons 0-25
-	for (my $i = 0; $i < 13; $i++) {
-		my $working = {};
-		for (my $j = 0; $j < 26; $j ++) {
-			$working->{$j}=rand() / 10;
-		}
-		push @$arg2, { 'iamanoutput' => 0,
-					  'inputs' => {},
-					  'neurons' => $working };
-	} # Made neurons 26-38
-	for (my $i = 0; $i < 13; $i++) {
-		my $working = {};
-		for (my $j = 0; $j < 39; $j ++) {
-			$working->{$j}= rand() / 10;
-		}
-		push @$arg2, { 'iamanoutput' => 0,
-					  'inputs' => {},
-					  'neurons' => $working };
-	} # Made neurons 39-51
-	for (my $i = 0; $i < 5; $i++) {
-		my $working = {};
-		for (my $j = 26; $j < 52; $j ++) {
-			$working->{$j}=rand() / 2;
-		}
-		push @$arg2, { 'iamanoutput' => 1,
-					  'inputs' => {},
-					  'neurons' => $working };
-	} # Made neurons 52-56
-	$data{'data'} = $arg2;
-	return $class->$orig(%data);
+    my $orig = shift;
+    my $class = shift;
+    if (defined $_[0] && ref $_[0] eq 'HASH') {
+    	return $class->$orig(%{$_[0]});
+    } elsif (@_ > 0) {
+        my %data = @_;
+        if (exists $data{'data'}) {
+            return $class->$orig(@_);
+        }
+    }
+    my %data = @_;
+    $data{'inputs'} ||= 15;
+    $data{'minvalue'} ||= -2;
+    $data{'maxvalue'} ||= 2;
+    $data{'backprop_eta'} ||= 0.01;
+## Pull to center, 0
+#    $data{'afunc'} ||= sub { tan( 2 * (shift)  / 3 ) / 2.1 };
+#    $data{'dafunc'} ||= sub { 20/63 / cos( 2 * (shift) / 3 ) ** 2 };
+## Pull away from center, 0
+    $data{'afunc'} ||= sub { 2 * erf(shift)};
+    $data{'dafunc'} ||= sub { 4 / sqrt(M_PI) * exp( -1 * ((shift) ** 2) ) };
+## Pull away from center, 1
+#    $data{'afunc'} ||= sub { erf( 2 * ( (shift) - 1 ) ) + 1};
+#    $data{'dafunc'} ||= sub { 4 / sqrt(M_PI) * exp( -4 * ( (shift) - 1 ) ** 2 ) };
+    my @arg2 = ();
+    for (my $i = 0; $i < 15; $i++) {
+        push @arg2, { 'iamanoutput' => 0,
+                      'inputs' => [ $i => rand() ],
+                      'neurons' => [ ],
+                      'eta_inputs' => [ $i => rand() ],
+                      'eta_neurons' => [ ] };
+        push @arg2, { 'iamanoutput' => 0,
+                      'inputs' => [ $i => 3 * rand() - 2 ],
+                      'neurons' => [ ],
+                      'eta_inputs' => [ $i => 3 * rand() - 2 ],
+                      'eta_neurons' => [ ] };
+    } # Made neurons 0-29
+    for (my $i = 0; $i < 15; $i++) {
+        my @working = ();
+        my @eta_working = ();
+        for (my $j = 0; $j < 30; $j ++) {
+            $working[$j] = rand() / 10 - 0.05;
+            $eta_working[$j] = rand() / 10 - 0.05;
+        }
+        push @arg2, { 'iamanoutput' => 0,
+                       'inputs' => [],
+                       'neurons' => \@working,
+                       'eta_inputs' => [],
+                       'eta_neurons' => \@eta_working };
+    } # Made neurons 30-44
+    for (my $i = 0; $i < 15; $i++) {
+        my @working = ();
+        my @eta_working = ();
+        for (my $j = 0; $j < 45; $j ++) {
+            $working[$j] = rand() / 10 - 0.05;
+            $eta_working[$j] = rand() / 10 - 0.05;
+        }
+        push @arg2, { 'iamanoutput' => 0,
+                       'inputs' => [],
+                       'neurons' => \@working,
+                       'eta_inputs' => [],
+                       'eta_neurons' => \@eta_working };
+    } # Made neurons 45-59
+    for (my $i = 0; $i < 5; $i++) {
+        my @working = ();
+        my @eta_working = ();
+        for (my $j = 30; $j < 60; $j ++) {
+            $working[$j] = rand() / 2 - 0.25;
+            $eta_working[$j] = rand() / 2 - 0.25;
+        }
+        push @arg2, { 'iamanoutput' => 1,
+                       'inputs' => [],
+                       'neurons' => \@working,
+                       'eta_inputs' => [],
+                       'eta_neurons' => \@eta_working };
+    } # Made neurons 60-64
+    $data{'data'} = \@arg2;
+    return $class->$orig(%data);
 };
+
+__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -71,7 +108,7 @@ DCOLLINS::ANN::Robot - a wrapper for AI::ANN
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -94,7 +131,7 @@ Current battery power (0-1)
 Current pain value (0-1)
 Differential battery power ((-1)-1)
 Differential pain value ((-1)-1)
-Proximity readings, -45, 0, 45 degrees (0-1)
+Proximity readings, -90, -45, 0, 45, 90 degrees (0-1)
 Current X location (0-1)
 Current Y location (0-1)
 Currently facing: N, S, E, W (0-1)

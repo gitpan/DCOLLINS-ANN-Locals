@@ -1,6 +1,6 @@
 # change 'tests => 1' to 'tests => last_test_to_print';
 
-use Test::More tests => 18;
+use Test::More tests => 21;
 BEGIN { use_ok('DCOLLINS::ANN::Robot'); 
 use_ok('AI::ANN::Evolver'); };
 
@@ -21,7 +21,7 @@ is($#{$out}, 4, "execute() output for a single neuron is the right length");
 ($inputs, $neurons, $outputs) = $network->get_state();
 
 is($#{$inputs}, 0, "get_state inputs is correct length");
-is($#{$neurons}, 56, "get_state neurons is correct length");
+is($#{$neurons}, 64, "get_state neurons is correct length");
 is($#{$outputs}, 4, "get_state outputs is correct length");
 
 $evolver=new AI::ANN::Evolver ({});
@@ -41,5 +41,12 @@ $network4=$evolver->mutate($network);
 ok(defined $network4, "mutate() works");
 ok($network4->isa("AI::ANN"), "Right class");
 ok($network4->isa("DCOLLINS::ANN::Robot"), "Right class");
+
+
+$network5=$evolver->mutate_gaussian($network);
+
+ok(defined $network5, "mutate_gaussian() works");
+ok($network5->isa("AI::ANN"), "Right class");
+ok($network5->isa("DCOLLINS::ANN::Robot"), "Right class");
 
 

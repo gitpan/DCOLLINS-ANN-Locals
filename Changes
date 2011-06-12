@@ -1,5 +1,9 @@
 Revision History for DCOLLINS::AI
 
+0.003     2011-06-12 05:08:21 UTC
+          Additional (working) example using the mutate() option. Works quite 
+          well, but slowly.
+
 0.002     2011-06-01 05:23:14 UTC
           Now we use Moose!
 
