@@ -5,6 +5,11 @@ META.yml
 Makefile.PL
 README
 TODO
+_Inline/config-i686-linux-gnu-thread-multi-5.010001
+_Inline/lib/auto/AI/ANN/Neuron_e488/Neuron_e488.inl
+_Inline/lib/auto/AI/ANN/Neuron_e488/Neuron_e488.so
+_Inline/lib/auto/DCOLLINS/ANN/Robot_c6f7/Robot_c6f7.inl
+_Inline/lib/auto/DCOLLINS/ANN/Robot_c6f7/Robot_c6f7.so
 dist.ini
 examples/display_robot.pl
 examples/evolver.pl

@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 package DCOLLINS::ANN::Robot;
 BEGIN {
-  $DCOLLINS::ANN::Robot::VERSION = '0.003';
+  $DCOLLINS::ANN::Robot::VERSION = '0.004';
 }
 use strict;
 use warnings;
@@ -12,6 +12,9 @@ extends 'AI::ANN';
 
 use Storable qw(dclone);
 use Math::Libm qw(erf M_PI tan);
+#use Memoize;
+#memoize('_afunc_default');
+#memoize('_dafunc_default');
 
 
 around BUILDARGS => sub {
@@ -34,22 +37,25 @@ around BUILDARGS => sub {
 #    $data{'afunc'} ||= sub { tan( 2 * (shift)  / 3 ) / 2.1 };
 #    $data{'dafunc'} ||= sub { 20/63 / cos( 2 * (shift) / 3 ) ** 2 };
 ## Pull away from center, 0
-    $data{'afunc'} ||= sub { 2 * erf(shift)};
-    $data{'dafunc'} ||= sub { 4 / sqrt(M_PI) * exp( -1 * ((shift) ** 2) ) };
+#    $data{'afunc'} ||= \&_afunc_default();
+#    $data{'dafunc'} ||= \&_dafunc_default();
+    $data{'afunc'} ||= sub{_afunc_c(shift)};
+    $data{'dafunc'} ||= sub{_dafunc_c(shift)};
+
 ## Pull away from center, 1
 #    $data{'afunc'} ||= sub { erf( 2 * ( (shift) - 1 ) ) + 1};
 #    $data{'dafunc'} ||= sub { 4 / sqrt(M_PI) * exp( -4 * ( (shift) - 1 ) ** 2 ) };
     my @arg2 = ();
     for (my $i = 0; $i < 15; $i++) {
         push @arg2, { 'iamanoutput' => 0,
-                      'inputs' => [ $i => rand() ],
+                      'inputs' => { $i => rand() },
                       'neurons' => [ ],
-                      'eta_inputs' => [ $i => rand() ],
+                      'eta_inputs' => { $i => rand() },
                       'eta_neurons' => [ ] };
         push @arg2, { 'iamanoutput' => 0,
-                      'inputs' => [ $i => 3 * rand() - 2 ],
+                      'inputs' => { $i => 3 * rand() - 2 },
                       'neurons' => [ ],
-                      'eta_inputs' => [ $i => 3 * rand() - 2 ],
+                      'eta_inputs' => { $i => 3 * rand() - 2 },
                       'eta_neurons' => [ ] };
     } # Made neurons 0-29
     for (my $i = 0; $i < 15; $i++) {
@@ -95,6 +101,34 @@ around BUILDARGS => sub {
     return $class->$orig(%data);
 };
 
+sub _afunc_default {
+	return 2 * erf(shift);
+}
+sub _dafunc_default {
+	return 4 / sqrt(M_PI) * exp( -1 * ((shift) ** 2) );
+}
+
+use Inline C => <<'END_C';
+#include <math.h>
+double afunc[4001];
+double dafunc[4001];
+void generate_globals() {
+        int i;
+        for (i=0;i<=4000;i++) {
+                afunc[i] = 2 * (erf(i/1000.0-2));
+                dafunc[i] = 4 / sqrt(M_PI) * pow(exp(-1 * ((i/1000.0-2))), 2);
+        }
+}
+double _afunc_c (float input) {
+        return afunc[(int) floor((input)*1000)+2000];
+}
+double _dafunc_c (float input) {
+        return dafunc[(int) floor((input)*1000)+2000];
+}
+END_C
+
+generate_globals();
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -108,7 +142,7 @@ DCOLLINS::ANN::Robot - a wrapper for AI::ANN
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

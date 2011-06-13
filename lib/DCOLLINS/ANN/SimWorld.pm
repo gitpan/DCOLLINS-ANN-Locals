@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 package DCOLLINS::ANN::SimWorld;
 BEGIN {
-  $DCOLLINS::ANN::SimWorld::VERSION = '0.003';
+  $DCOLLINS::ANN::SimWorld::VERSION = '0.004';
 }
 use strict;
 use warnings;
@@ -242,7 +242,7 @@ DCOLLINS::ANN::SimWorld - a simulated world for robots to play in
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

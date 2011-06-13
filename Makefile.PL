@@ -21,11 +21,12 @@ my %WriteMakefileArgs = (
   'NAME' => 'DCOLLINS::ANN::Locals',
   'PREREQ_PM' => {
     'AI::ANN' => '0',
+    'Inline::C' => '0',
     'Math::Libm' => '1.00',
     'Moose' => '2.00',
     'Storable' => '0'
   },
-  'VERSION' => '0.003',
+  'VERSION' => '0.004',
   'test' => {
     'TESTS' => 't/*.t'
   }
